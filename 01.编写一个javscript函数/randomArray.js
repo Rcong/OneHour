@@ -19,3 +19,5 @@ function randomArray(n = 3, min = 0, max = 10) {
 
     return arr;
 }
+
+randomArray(5, 2, 32);
