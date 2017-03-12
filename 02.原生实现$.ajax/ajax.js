@@ -1,28 +1,22 @@
-function ajax(options) {
+;
+(function() {
 
-    let opt = Object.assign({}, options, {
-        type: 'GET',
-        success: function(res) {},
-        error: function(res) {}
-    });
-
-    let dataStr = '';
-    for (let key in opt.data) {
-        dataStr += key + '=' + opt.data[key] + '&';
-    }
-    dataStr = dataStr.slice(0, dataStr.length - 1);
-
-    if (opt.type.toLowerCase() === 'jsonp') {
-
-        let script = document.createElement('script');
-        let success = function(res) {
-            opt.success(res);
+    //格式化参数
+    function formatParams(paramObj) {
+        let arr = [];
+        for (let name in paramObj) {
+            arr.push(encodeURIComponent(name) + '=' + encodeURIComponent(paramObj[name]));
         }
-        script.src = opt.url + '?' + 'callback = success';
-        document.head.appendChild(script);
-        document.head.removeChild(script);
+        return arr.join('&');
+    }
 
-    } else {
+    function ajax(options) {
+
+        let opt = Object.assign({}, {
+            type: 'GET',
+            success: function(res) {},
+            error: function(res) {}
+        }, options);
 
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -36,7 +30,7 @@ function ajax(options) {
         }
 
         if (opt.type.toLowerCase() === 'get') {
-            xhr.open(opt.type, opt.url + '?' + dataStr, true);
+            xhr.open(opt.type, opt.url + '?' + formatParams(opt.data), true);
             xhr.send();
         }
         if (opt.type.toLowerCase() === 'post') {
@@ -47,5 +41,35 @@ function ajax(options) {
 
     }
 
+    function jsonp(options) {
 
-}
+        let opt = Object.assign({}, {
+            callback: 'callback',
+            success: function(res) {},
+            error: function(res) {}
+        }, options);
+
+        // formatParams
+        let script = document.createElement('script'),
+            paramStr = '';
+        if (opt.data) {
+            opt.data.callback = opt.callback;
+            paramStr += formatParams(opt.data);
+        } else {
+            paramStr = 'callback=' + opt.callback;
+        }
+        window[opt.callback] = function(res) {
+            opt.success(res);
+        }
+        script.src = opt.url + '?' + paramStr;
+        document.head.appendChild(script);
+        document.head.removeChild(script);
+
+    }
+
+    window.$.ajax = ajax;
+    window.$.jsonp = jsonp;
+
+})();
+
+$.jsonp({url:'http://api.jirengu.com/fm/getChannels.php', callback:'getChannel', success:function(res){console.log(res)}});
