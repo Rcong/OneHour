@@ -72,4 +72,13 @@
 
 })();
 
-$.jsonp({url:'http://api.jirengu.com/fm/getChannels.php', callback:'getChannel', success:function(res){console.log(res)}});
+$.jsonp({
+    url: 'http://api.jirengu.com/fm/getChannels.php',
+    callback: 'getChannel',
+    success: function(res) {
+        console.log(res)
+    },
+    error: function(res) {
+        console.log(res)
+    } 
+});
