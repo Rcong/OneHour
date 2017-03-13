@@ -21,11 +21,11 @@
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                let json = JSON.stringify(xhr.responseText());
+                let json = JSON.stringify(xhr.responseText);
                 opt.success(json);
             }
             if (xhr.readyState === 4 && xhr.status === 404) {
-                opt.error();
+                opt.error(xhr.status);
             }
         }
 
@@ -80,5 +80,5 @@ $.jsonp({
     },
     error: function(res) {
         console.log(res)
-    } 
+    }
 });
